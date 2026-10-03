@@ -1,0 +1,62 @@
+cat << 'EOF' > .github/workflows/deploy.yml
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1                  # Update if your Filestore/Cloud Run is in another region
+  SERVICE_NAME: photo-gallery          # Cloud Run service name
+  GAR_REPO: app-repo                    # The Artifact Registry repo created earlier
+  IMAGE_NAME: photo-gallery-app
+  
+  # Filestore & VPC Networking Configuration
+  NETWORK: default                      # VPC network where Filestore resides
+  SUBNET: default                       # Subnet in the region specified above
+  FILESTORE_IP: 10.0.0.2                # Replace with your actual Filestore IP
+  FILESTORE_SHARE: /vol1                # Replace with your Filestore share name
+  MOUNT_PATH: /mnt/filestore            # Directory path inside container
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t "$TAG" .
+          docker push "$TAG"
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run with Direct VPC & Filestore NFS Mount
+        run: |
+          gcloud beta run deploy ${{ env.SERVICE_NAME }} \
+            --image=${{ env.IMAGE_TAG }} \
+            --region=${{ env.REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --network=${{ env.NETWORK }} \
+            --subnet=${{ env.SUBNET }} \
+            --vpc-egress=private-ranges-only \
+            --execution-environment=gen2 \
+            --add-volume=name=filestore-nfs,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
+            --add-volume-mount=volume=filestore-nfs,mount-path=${{ env.MOUNT_PATH }}
+EOF
