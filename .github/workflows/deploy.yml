@@ -49,7 +49,7 @@ jobs:
           docker push "$TAG"
           echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
 
-      - name: Deploy to Cloud Run with Direct VPC & Filestore NFS Mount
+      - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE_NAME }} --quiet \
             --image=${{ env.IMAGE_TAG }} \
