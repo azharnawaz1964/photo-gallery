@@ -51,7 +51,7 @@ jobs:
 
       - name: Deploy to Cloud Run with Direct VPC & Filestore NFS Mount
         run: |
-          gcloud beta run deploy ${{ env.SERVICE_NAME }} \
+          gcloud beta run deploy ${{ env.SERVICE_NAME }} --quiet\
             --image=${{ env.IMAGE_TAG }} \
             --region=${{ env.REGION }} \
             --platform=managed \
