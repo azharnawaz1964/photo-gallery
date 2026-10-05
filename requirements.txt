@@ -4,3 +4,4 @@ google-cloud-firestore
 werkzeug
 itsdangerous
 resend
+gunicorn
