@@ -55,10 +55,10 @@ jobs:
             --image=${{ env.IMAGE_TAG }} \
             --region=${{ env.REGION }} \
             --platform=managed \
-            --allow-unauthenticated \
-            --network=${{ env.NETWORK }} \
-            --subnet=${{ env.SUBNET }} \
-            --vpc-egress=private-ranges-only \
-            --execution-environment=gen2 \
-            --add-volume=name=filestore-nfs,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
-            --add-volume-mount=volume=filestore-nfs,mount-path=${{ env.MOUNT_PATH }}
+            --allow-unauthenticated #\
+   #         --network=${{ env.NETWORK }} \
+   #         --subnet=${{ env.SUBNET }} \
+   #         --vpc-egress=private-ranges-only \
+   #         --execution-environment=gen2 \
+   #         --add-volume=name=filestore-nfs,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
+   #         --add-volume-mount=volume=filestore-nfs,mount-path=${{ env.MOUNT_PATH }}
