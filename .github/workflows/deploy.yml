@@ -1,4 +1,3 @@
-cat << 'EOF' > .github/workflows/deploy.yml
 name: Build and Deploy to Cloud Run
 
 on:
@@ -23,6 +22,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -30,7 +32,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/189078890713/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions-sa@portrait-gallery-509110.iam.gserviceaccount.com'
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -59,4 +62,3 @@ jobs:
             --execution-environment=gen2 \
             --add-volume=name=filestore-nfs,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
             --add-volume-mount=volume=filestore-nfs,mount-path=${{ env.MOUNT_PATH }}
-EOF
