@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: us-central1                  # Update if your Filestore/Cloud Run is in another region
+  REGION: europe-west1                  # Update if your Filestore/Cloud Run is in another region
   SERVICE_NAME: photo-gallery          # Cloud Run service name
   GAR_REPO: app-repo                    # The Artifact Registry repo created earlier
   IMAGE_NAME: photo-gallery-app
