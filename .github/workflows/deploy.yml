@@ -8,7 +8,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: europe-west1                  # Update if your Filestore/Cloud Run is in another region
-  SERVICE_NAME: photo-gallery          # Cloud Run service name
+  SERVICE_NAME: photo-gallery           # Cloud Run service name
   GAR_REPO: app-repo                    # The Artifact Registry repo created earlier
   IMAGE_NAME: photo-gallery-app
   
@@ -55,4 +55,12 @@ jobs:
             --image=${{ env.IMAGE_TAG }} \
             --region=${{ env.REGION }} \
             --platform=managed \
-            --allow-unauthenticated 
+            --allow-unauthenticated
+
+      - name: Display Service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "### 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "**Service URL:** [$SERVICE_URL]($SERVICE_URL)" >> $GITHUB_STEP_SUMMARY
