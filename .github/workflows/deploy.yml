@@ -57,7 +57,7 @@ jobs:
             --set-env-vars=BUCKET_NAME=${{ env.BUCKET_NAME }} \
             --clear-volumes \
             --clear-volume-mounts \
-            --clear-network-interfaces \
+            --clear-network \
             --clear-vpc-connector \
             --quiet
 
