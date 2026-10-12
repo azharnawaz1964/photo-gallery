@@ -7,15 +7,17 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: europe-west1
-  SERVICE_NAME: photo-gallery
-  GAR_REPO: app-repo
+  REGION: europe-west1                  # Filestore & Cloud Run region
+  SERVICE_NAME: photo-gallery           # Cloud Run service name
+  GAR_REPO: app-repo                    # Artifact Registry repository
   IMAGE_NAME: photo-gallery-app
-  NETWORK: default
-  SUBNET: default
-  FILESTORE_IP: 10.0.0.2
-  FILESTORE_SHARE: /vol1
-  MOUNT_PATH: /mnt/filestore
+  
+  # Filestore & VPC Networking Configuration
+  NETWORK: default                      # VPC network where Filestore resides
+  SUBNET: default                       # Subnet in europe-west1
+  FILESTORE_IP: 10.0.0.2                # Filestore instance IP
+  FILESTORE_SHARE: /vol1                # Filestore file share name
+  MOUNT_PATH: /mnt/filestore            # Directory path inside container
 
 jobs:
   deploy:
@@ -23,7 +25,6 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
-    # Bind the deployment environment and dynamic URL here:
     environment:
       name: production
       url: ${{ steps.get-url.outputs.service_url }}
@@ -58,7 +59,13 @@ jobs:
             --image=${{ env.IMAGE_TAG }} \
             --region=${{ env.REGION }} \
             --platform=managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --execution-environment=gen2 \
+            --network=${{ env.NETWORK }} \
+            --subnet=${{ env.SUBNET }} \
+            --vpc-egress=private-ranges-only \
+            --add-volume=name=filestore-volume,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
+            --add-volume-mount=volume=filestore-volume,mount-path=${{ env.MOUNT_PATH }}
 
       - name: Get Cloud Run URL
         id: get-url
