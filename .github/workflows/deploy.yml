@@ -7,17 +7,11 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: europe-west1                  # Filestore & Cloud Run region
-  SERVICE_NAME: photo-gallery           # Cloud Run service name
-  GAR_REPO: app-repo                    # Artifact Registry repository
+  REGION: europe-west1
+  SERVICE_NAME: photo-gallery
+  GAR_REPO: app-repo
   IMAGE_NAME: photo-gallery-app
-  
-  # Filestore & VPC Networking Configuration
-  NETWORK: default                      # VPC network where Filestore resides
-  SUBNET: default                       # Subnet in europe-west1
-  FILESTORE_IP: 10.122.1.130            # Filestore instance IP
-  FILESTORE_SHARE: /vol1                # Filestore file share name
-  MOUNT_PATH: /mnt/filestore            # Directory path inside container
+  BUCKET_NAME: community-project-photo-gallery
 
 jobs:
   deploy:
@@ -60,7 +54,8 @@ jobs:
             --region=${{ env.REGION }} \
             --platform=managed \
             --allow-unauthenticated \
-    
+            --set-env-vars="BUCKET_NAME=${{ env.BUCKET_NAME }}"
+
       - name: Get Cloud Run URL
         id: get-url
         run: |
