@@ -65,3 +65,4 @@ jobs:
           echo "service_url=$URL" >> $GITHUB_OUTPUT
           echo "### 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "**Service URL:** [$URL]($URL)" >> $GITHUB_STEP_SUMMARY
+
