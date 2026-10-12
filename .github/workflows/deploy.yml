@@ -15,7 +15,7 @@ env:
   # Filestore & VPC Networking Configuration
   NETWORK: default                      # VPC network where Filestore resides
   SUBNET: default                       # Subnet in europe-west1
-  FILESTORE_IP: 10.0.0.2                # Filestore instance IP
+  FILESTORE_IP: 10.122.1.130            # Filestore instance IP
   FILESTORE_SHARE: /vol1                # Filestore file share name
   MOUNT_PATH: /mnt/filestore            # Directory path inside container
 
@@ -60,13 +60,7 @@ jobs:
             --region=${{ env.REGION }} \
             --platform=managed \
             --allow-unauthenticated \
-            --execution-environment=gen2 \
-            --network=${{ env.NETWORK }} \
-            --subnet=${{ env.SUBNET }} \
-            --vpc-egress=private-ranges-only \
-            --add-volume=name=filestore-volume,type=nfs,location=${{ env.FILESTORE_IP }}:${{ env.FILESTORE_SHARE }} \
-            --add-volume-mount=volume=filestore-volume,mount-path=${{ env.MOUNT_PATH }}
-
+    
       - name: Get Cloud Run URL
         id: get-url
         run: |
